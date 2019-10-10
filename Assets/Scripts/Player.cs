@@ -6,6 +6,9 @@ public class Player : MonoBehaviour
 {
     [SerializeField]
     private float _speed = 5.0f;
+    
+    [SerializeField]
+    private float _speedRotate = 2.0f;
     private float _speedMultiplier = 2.0f;
 
     [SerializeField]
@@ -84,9 +87,10 @@ public class Player : MonoBehaviour
         float horizontal = Input.GetAxis("Horizontal");     //Left-Right
         float vertical = Input.GetAxis("Vertical");         //Up-Down
         
-        Vector3 direction = new Vector3(horizontal, vertical, 0);
+
+        Vector3 direction = new Vector3(0, vertical, 0);
         transform.Translate(direction * _speed * Time.deltaTime);
-        transform.position = new Vector3(transform.position.x, Mathf.Clamp(transform.position.y, -4.6f, 0));
+        transform.Rotate(Vector3.forward * (horizontal * -1.0f) * _speedRotate);
 
         if (transform.position.x <= -11.1f)
         {
@@ -96,6 +100,15 @@ public class Player : MonoBehaviour
         {
             transform.position = new Vector3(-11.1f, transform.position.y, 0); 
         }
+
+        if (transform.position.y >= 7.5f)
+        {
+            transform.position = new Vector3(transform.position.x, -6.7f, 0);
+        }
+        else if ( transform.position.y <= -6.7)
+        {
+            transform.position = new Vector3(transform.position.x, 7.5f, 0);
+        }
     }
 
     private void Shoot()
@@ -104,11 +117,11 @@ public class Player : MonoBehaviour
 
         if (!_isTripleShotActive)
         {
-            Instantiate(_firePrefab, transform.position, Quaternion.identity);
+            Instantiate(_firePrefab, transform.position, transform.rotation);
         }
         else 
         {
-            Instantiate(_tripleShotPrefab, transform.position, Quaternion.identity);
+            Instantiate(_tripleShotPrefab, transform.position, transform.rotation);
         }
         
         _audioSource.Play();
