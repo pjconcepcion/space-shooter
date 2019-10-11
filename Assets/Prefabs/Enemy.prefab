@@ -17,7 +17,7 @@ GameObject:
   - component: {fileID: 523347115712999498}
   m_Layer: 0
   m_Name: Enemy
-  m_TagString: Untagged
+  m_TagString: Enemy
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
@@ -99,6 +99,8 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   _speed: 5
   _audioClip: {fileID: 8300000, guid: a885c043fab7e46438bba03ba9dab6bc, type: 3}
+  _laserPrefab: {fileID: 1272299932575739912, guid: da80dd2ce12a3c8469572e0908c32594,
+    type: 3}
 --- !u!61 &2135744311
 BoxCollider2D:
   m_ObjectHideFlags: 0
