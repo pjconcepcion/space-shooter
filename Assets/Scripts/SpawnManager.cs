@@ -39,7 +39,7 @@ public class SpawnManager : MonoBehaviour
     {
         yield return new WaitForSeconds(2.0f);
         
-        while (_isGameOver == false)
+        while (!_isGameOver)
         {
             Vector3 position = new Vector3(Random.Range(-9f,9f), 6.75f, 0);
             GameObject newEnemy = Instantiate(_enemyPrefab, position, Quaternion.identity);
@@ -52,9 +52,29 @@ public class SpawnManager : MonoBehaviour
     {
         yield return new WaitForSeconds(3.0f);
 
-        while (_isGameOver == false)
+        while (!_isGameOver)
         {
-            Vector3 position = new Vector3(Random.Range(-9f,9f), 6.75f, 0);
+            int spawnLocation = Random.Range(0,4);
+            Vector3 position = Vector3.zero;
+            switch(spawnLocation)
+            {
+                case 0:  // top
+                    position = new Vector3(Random.Range(-9f,9f), 6.75f, 0);
+                    break;
+                case 1: // bottom
+                    position = new Vector3(Random.Range(-9f,9f), -6.75f, 0);
+                    break;
+                case 2: // left
+                    position = new Vector3(-11f, Random.Range(4.5f,-4.5f), 0);
+                    break;
+                case 3: // right
+                    position = new Vector3(11f, Random.Range(4.5f,-4.5f), 0);
+                    break;
+                default:
+                    Debug.Log("No spawn");
+                    break;
+            }
+            
             int randomPowerup = Random.Range(0,3);
             GameObject newPowerup = Instantiate(_powerupPrefab[randomPowerup], position, Quaternion.identity);
             newPowerup.transform.parent = _powerupContainer.transform;

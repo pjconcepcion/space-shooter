@@ -14,6 +14,7 @@ public class Powerups : MonoBehaviour
     private AudioClip _audioClip;
 
     private Player _player;
+    private Vector3 _movement;
 
     // Start is called before the first frame update
     private void Start()
@@ -24,14 +25,16 @@ public class Powerups : MonoBehaviour
         {
             Debug.LogError("Player not found.");
         }   
+
+        SetMovement();
     }
 
     // Update is called once per frame
     private void Update()
     {
-        transform.Translate(Vector3.down * _speed * Time.deltaTime);
+        transform.Translate(_movement * _speed * Time.deltaTime); 
 
-        if (transform.position.y <= -6.75f)
+        if (transform.position.y <= -6.75f || transform.position.y >= 6.75f || transform.position.x >= 11f || transform.position.x <= -11f)
         {
             Destroy(this.gameObject);
         }
@@ -59,6 +62,27 @@ public class Powerups : MonoBehaviour
 
             AudioSource.PlayClipAtPoint(_audioClip, transform.position);
             Destroy(this.gameObject);
+        }
+    }
+
+    private void SetMovement()
+    {
+        if (transform.position.y == 6.75f)
+        {
+            _movement = Vector3.down;
+        }
+        else if (transform.position.y == -6.75f)
+        {
+            _movement = Vector3.up;
+        }
+
+        if (transform.position.x == 11f)
+        {
+            _movement = Vector3.left;
+        }
+        else if (transform.position.x == -11f)
+        {
+            _movement = Vector3.right;
         }
     }
 }
