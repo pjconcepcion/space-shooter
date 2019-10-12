@@ -16,6 +16,9 @@ public class SpawnManager : MonoBehaviour
     [SerializeField]
     private GameObject _powerupContainer;
 
+    [SerializeField]
+    private GameObject _asteroidPrefab;
+
     private bool _isGameOver;
 
     // Start is called before the first frame update
@@ -33,6 +36,7 @@ public class SpawnManager : MonoBehaviour
     {
         StartCoroutine(SpawnEnemyRoutine());
         StartCoroutine(SpawnPoweupRoutine());
+        StartCoroutine(SpawnAsteroidRoutine());
     }
 
     IEnumerator SpawnEnemyRoutine()
@@ -54,31 +58,44 @@ public class SpawnManager : MonoBehaviour
 
         while (!_isGameOver)
         {
-            int spawnLocation = Random.Range(0,4);
-            Vector3 position = Vector3.zero;
-            switch(spawnLocation)
-            {
-                case 0:  // top
-                    position = new Vector3(Random.Range(-9f,9f), 6.75f, 0);
-                    break;
-                case 1: // bottom
-                    position = new Vector3(Random.Range(-9f,9f), -6.75f, 0);
-                    break;
-                case 2: // left
-                    position = new Vector3(-11f, Random.Range(4.5f,-4.5f), 0);
-                    break;
-                case 3: // right
-                    position = new Vector3(11f, Random.Range(4.5f,-4.5f), 0);
-                    break;
-                default:
-                    Debug.Log("No spawn");
-                    break;
-            }
-            
+            Vector3 position = GetRandomPosition();            
             int randomPowerup = Random.Range(0,3);
             GameObject newPowerup = Instantiate(_powerupPrefab[randomPowerup], position, Quaternion.identity);
             newPowerup.transform.parent = _powerupContainer.transform;
             yield return new WaitForSeconds(Random.Range(3f, 7f));
+        }
+    }
+
+    IEnumerator SpawnAsteroidRoutine()
+    {
+        yield return new WaitForSeconds(10.0f);
+
+        while(!_isGameOver)
+        {
+            Vector3 position = GetRandomPosition();
+            GameObject newAsteroid = Instantiate(_asteroidPrefab, position, Quaternion.identity);
+            Asteroid asteroid = newAsteroid.GetComponent<Asteroid>();
+            asteroid.AssignExtra();
+            newAsteroid.transform.parent = this.transform;
+            yield return new WaitForSeconds(10);
+        }
+    }
+
+    private Vector3 GetRandomPosition()
+    {
+        int spawnLocation = Random.Range(0,4);
+        switch(spawnLocation)
+        {
+            case 0:  // top
+                return new Vector3(Random.Range(-9f,9f), 6.75f, 0);
+            case 1: // bottom
+                return new Vector3(Random.Range(-9f,9f), -6.75f, 0);
+            case 2: // left
+                return new Vector3(-11f, Random.Range(4.5f,-4.5f), 0);
+            case 3: // right
+                return new Vector3(11f, Random.Range(4.5f,-4.5f), 0);
+            default:
+                return Vector3.zero;
         }
     }
 
