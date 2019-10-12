@@ -87,7 +87,6 @@ public class Player : MonoBehaviour
         float horizontal = Input.GetAxis("Horizontal");     //Left-Right
         float vertical = Input.GetAxis("Vertical");         //Up-Down
         
-
         Vector3 direction = new Vector3(0, vertical, 0);
         transform.Translate(direction * _speed * Time.deltaTime);
         transform.Rotate(Vector3.forward * (horizontal * -1.0f) * _speedRotate);

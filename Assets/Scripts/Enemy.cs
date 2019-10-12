@@ -10,6 +10,11 @@ public class Enemy : MonoBehaviour
     [SerializeField]
     private AudioClip _audioClip;
 
+    [SerializeField]
+    private GameObject _laserPrefab;
+
+    private bool _isEnemyDead = false;
+
     private Player _player;
     private Animator _animator;
     private UIManager _uiManager;
@@ -46,6 +51,8 @@ public class Enemy : MonoBehaviour
         {
             _audioSource.clip = _audioClip;
         }
+
+        StartCoroutine(Shoot());
     }
 
     // Update is called once per frame
@@ -53,9 +60,10 @@ public class Enemy : MonoBehaviour
     {
         transform.Translate(Vector3.down * _speed * Time.deltaTime);
 
-        if (transform.position.y <= -6.7f)
+        if ((transform.position.x >= 11.1f || transform.position.x <= -11.1f) || transform.position.y <= -6.7f)
         {
             transform.position = new Vector3(Random.Range(-9f,9f), 6.75f, 0);
+            transform.rotation = Quaternion.Euler(0, 0, Random.Range(-50.0f, 50.0f));
         }
     }
 
@@ -64,37 +72,33 @@ public class Enemy : MonoBehaviour
         if (other.gameObject.tag == "Player")
         {
             _player.OnDamage();
-
-            int randomScore = Random.Range(10, 20);
-            _uiManager.UpdateScore(randomScore);
-
-            _animator.SetTrigger("OnEnemyDeath");
-            _speed = 0;
-
-            _audioSource.Play();
-
-            Destroy(GetComponent<Collider2D>());
-            Destroy(this.gameObject, 2.5f);
+            OnEnemyDeath();
         }
+    }
 
-        if (other.gameObject.tag == "Laser")
+    public void OnEnemyDeath()
+    {
+        int randomScore = Random.Range(10, 20);
+        _uiManager.UpdateScore(randomScore);
+
+        _animator.SetTrigger("OnEnemyDeath");
+        _audioSource.Play();
+
+        _speed = 0;
+        _isEnemyDead = true;
+
+        Destroy(GetComponent<Collider2D>());
+        Destroy(this.gameObject, 2.5f);
+    }
+
+    IEnumerator Shoot()
+    {
+        while(!_isEnemyDead)
         {
-            if( other.transform.parent != null)
-            {
-                Destroy(other.transform.parent.gameObject);
-            }
-
-            int randomScore = Random.Range(10, 20);
-            _uiManager.UpdateScore(randomScore);
-            
-            _animator.SetTrigger("OnEnemyDeath");
-            _speed = 0;
-
-            _audioSource.Play();
-
-            Destroy(other.gameObject);
-            Destroy(GetComponent<Collider2D>());
-            Destroy(this.gameObject, 2.5f);
+            GameObject enemyLaser = Instantiate(_laserPrefab, transform.position, transform.rotation);
+            Laser laser = enemyLaser.GetComponent<Laser>();
+            laser.AssignEnemy();
+            yield return new WaitForSeconds(Random.Range(3f, 5f));
         }
     }
 }
