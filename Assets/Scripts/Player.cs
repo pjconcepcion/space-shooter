@@ -42,6 +42,7 @@ public class Player : MonoBehaviour
 
     private bool _isTripleShotActive = false;
     private bool _isShieldActive = false;
+    private bool _isInPlayArea = true;
 
     // Start is called before the first frame update
     private void Start()
@@ -76,6 +77,7 @@ public class Player : MonoBehaviour
     private void Update()
     {
         Movement();
+        OnPlayArea();
         if (Input.GetKeyDown(KeyCode.Space) && Time.time > _canFire)
         {
             Shoot();
@@ -104,7 +106,7 @@ public class Player : MonoBehaviour
         {
             transform.position = new Vector3(transform.position.x, -6.7f, 0);
         }
-        else if ( transform.position.y <= -6.7)
+        else if ( transform.position.y <= -7.3f)
         {
             transform.position = new Vector3(transform.position.x, 7.5f, 0);
         }
@@ -122,7 +124,7 @@ public class Player : MonoBehaviour
         {
             Instantiate(_tripleShotPrefab, transform.position, transform.rotation);
         }
-        
+
         _audioSource.Play();
     }
 
@@ -172,6 +174,18 @@ public class Player : MonoBehaviour
     {
         _isTripleShotActive = true;
         StartCoroutine(OnTripleShotActiveRoutine());
+    }
+
+    private void OnPlayArea()
+    {
+        if (transform.position.y > 6.5f || transform.position.y <= -6.5f || transform.position.x > 11f || transform.position.x < -11f)
+        {
+            gameObject.tag = "Untagged";
+        }
+        else if ( transform.position.y <= 7.4)
+        {
+            gameObject.tag = "Player";   
+        }
     }
 
     IEnumerator OnSpeedActiveRoutine()
