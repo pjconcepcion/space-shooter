@@ -14,11 +14,13 @@ public class Enemy : MonoBehaviour
     private GameObject _laserPrefab;
 
     private bool _isEnemyDead = false;
+    private bool _isInPlayArea = false;
 
     private Player _player;
     private Animator _animator;
     private UIManager _uiManager;
     private AudioSource _audioSource;
+    private BoxCollider2D _boxCollder;
 
     // Start is called before the first frame update
     private void Start()
@@ -27,6 +29,7 @@ public class Enemy : MonoBehaviour
         _uiManager = GameObject.Find("Canvas").GetComponent<UIManager>();
         _animator = GetComponent<Animator>();
         _audioSource = GetComponent<AudioSource>();
+        _boxCollder = GetComponent<BoxCollider2D>();
 
         if (_player == null)
         {
@@ -41,6 +44,15 @@ public class Enemy : MonoBehaviour
         if (_uiManager == null)
         {
             Debug.LogError("UI Manager not found.");
+        }
+
+        if (_boxCollder == null)
+        {
+            Debug.LogError("Box Collder not found.");
+        }
+        else 
+        {
+            _boxCollder.enabled = false;
         }
 
         if (_audioSource == null)
@@ -65,6 +77,8 @@ public class Enemy : MonoBehaviour
             transform.position = new Vector3(Random.Range(-9f,9f), 6.75f, 0);
             transform.rotation = Quaternion.Euler(0, 0, Random.Range(-50.0f, 50.0f));
         }
+
+        OnPlayArea();
     }
 
     private void OnTriggerEnter2D(Collider2D other)
@@ -87,8 +101,22 @@ public class Enemy : MonoBehaviour
         _speed = 0;
         _isEnemyDead = true;
 
-        Destroy(GetComponent<Collider2D>());
+        Destroy(GetComponent<BoxCollider2D>());
         Destroy(this.gameObject, 2.5f);
+    }
+
+    private void OnPlayArea()
+    {
+        if (transform.position.y > 5.8f || transform.position.y <= -6.1f || transform.position.x > 11f || transform.position.x < -11f)
+        {
+            _isInPlayArea = false;
+            _boxCollder.enabled = false;
+        }
+        else if ( transform.position.y <= 5.8)
+        {
+            _isInPlayArea = true;    
+            _boxCollder.enabled = true;
+        }
     }
 
     IEnumerator Shoot()
