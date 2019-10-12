@@ -51,6 +51,8 @@ public class Enemy : MonoBehaviour
         {
             _audioSource.clip = _audioClip;
         }
+
+        StartCoroutine(Shoot());
     }
 
     // Update is called once per frame
@@ -70,7 +72,6 @@ public class Enemy : MonoBehaviour
         if (other.gameObject.tag == "Player")
         {
             _player.OnDamage();
-
             OnEnemyDeath();
         }
     }
@@ -88,5 +89,16 @@ public class Enemy : MonoBehaviour
 
         Destroy(GetComponent<Collider2D>());
         Destroy(this.gameObject, 2.5f);
+    }
+
+    IEnumerator Shoot()
+    {
+        while(!_isEnemyDead)
+        {
+            GameObject enemyLaser = Instantiate(_laserPrefab, transform.position, transform.rotation);
+            Laser laser = enemyLaser.GetComponent<Laser>();
+            laser.AssignEnemy();
+            yield return new WaitForSeconds(Random.Range(3f, 5f));
+        }
     }
 }
