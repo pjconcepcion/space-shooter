@@ -1801,7 +1801,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   _speed: 5
-  _speedRotate: 2
+  _speedRotate: 4
   _fireRate: 0.65
   _firePrefab: {fileID: 1272299932575739912, guid: da80dd2ce12a3c8469572e0908c32594,
     type: 3}
