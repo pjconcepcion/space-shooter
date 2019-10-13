@@ -19,7 +19,10 @@ public class SpawnManager : MonoBehaviour
     [SerializeField]
     private GameObject _asteroidPrefab;
 
-    private bool _isGameOver;
+    [SerializeField]
+    private GameObject _asteroidContainer;
+
+    private bool _isGameOver = false;
 
     // Start is called before the first frame update
     private void Start()
@@ -30,13 +33,6 @@ public class SpawnManager : MonoBehaviour
     private void Update()
     {
         
-    }
-
-    public void StartSpawning()
-    {
-        StartCoroutine(SpawnEnemyRoutine());
-        StartCoroutine(SpawnPoweupRoutine());
-        StartCoroutine(SpawnAsteroidRoutine());
     }
 
     IEnumerator SpawnEnemyRoutine()
@@ -74,9 +70,9 @@ public class SpawnManager : MonoBehaviour
         {
             Vector3 position = GetRandomPosition();
             GameObject newAsteroid = Instantiate(_asteroidPrefab, position, Quaternion.identity);
+            newAsteroid.transform.parent = _asteroidContainer.transform;
             Asteroid asteroid = newAsteroid.GetComponent<Asteroid>();
             asteroid.AssignExtra();
-            newAsteroid.transform.parent = this.transform;
             yield return new WaitForSeconds(10);
         }
     }
@@ -99,8 +95,25 @@ public class SpawnManager : MonoBehaviour
         }
     }
 
+    public void StartSpawning()
+    {
+        StartCoroutine(SpawnEnemyRoutine());
+        StartCoroutine(SpawnPoweupRoutine());
+        StartCoroutine(SpawnAsteroidRoutine());
+    }
+
     public void GameOver()
     {
         _isGameOver = true;
+    }
+
+    public void OnGamePause()
+    {
+        StopAllCoroutines();
+    }
+
+    public void OnGameUnpause()
+    {
+        StartSpawning();
     }
 }

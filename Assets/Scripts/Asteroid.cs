@@ -107,4 +107,16 @@ public class Asteroid : MonoBehaviour
         _isExtra = true;
         transform.localScale = new Vector3(0.5f,0.5f,0.5f);
     }
+
+    public void OnGamePause()
+    {
+        _speed = 0;
+        _speedRotation = 0;
+    }
+
+    public void OnGameUnpause()
+    {
+        _speed = 0.3f;
+        _speedRotation = 5.0f;
+    }
 }
