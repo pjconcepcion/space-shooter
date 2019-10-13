@@ -72,7 +72,8 @@ public class Laser : MonoBehaviour
 
     private void DestroyLaser()
     {
-        if( transform.parent != null)
+        Debug.Log(transform.parent.name);
+        if( transform.parent.tag == "TripleShot" && transform.parent != null)
         {
             Destroy(transform.parent.gameObject);
         }
@@ -83,5 +84,15 @@ public class Laser : MonoBehaviour
     public void AssignEnemy()
     {   
         _isEnemyLaser = true;
+    }
+
+    public void OnGamePause()
+    {
+        _speed = 0;
+    }
+
+    public void OnGameUnpause()
+    {
+        _speed = 22.0f;
     }
 }

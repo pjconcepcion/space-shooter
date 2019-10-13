@@ -101,6 +101,7 @@ MonoBehaviour:
   _audioClip: {fileID: 8300000, guid: a885c043fab7e46438bba03ba9dab6bc, type: 3}
   _laserPrefab: {fileID: 1272299932575739912, guid: da80dd2ce12a3c8469572e0908c32594,
     type: 3}
+  _laserContainer: {fileID: 0}
 --- !u!61 &2135744311
 BoxCollider2D:
   m_ObjectHideFlags: 0

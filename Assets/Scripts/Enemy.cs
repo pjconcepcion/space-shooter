@@ -13,6 +13,9 @@ public class Enemy : MonoBehaviour
     [SerializeField]
     private GameObject _laserPrefab;
 
+    [SerializeField]
+    private GameObject _laserContainer;
+
     private bool _isEnemyDead = false;
     private bool _isInPlayArea = false;
 
@@ -27,6 +30,7 @@ public class Enemy : MonoBehaviour
     {
         _player = GameObject.Find("Player").GetComponent<Player>();
         _uiManager = GameObject.Find("Canvas").GetComponent<UIManager>();
+        _laserContainer = GameObject.Find("LaserContainer");
         _animator = GetComponent<Animator>();
         _audioSource = GetComponent<AudioSource>();
         _boxCollder = GetComponent<BoxCollider2D>();
@@ -81,6 +85,33 @@ public class Enemy : MonoBehaviour
         OnPlayArea();
     }
 
+    IEnumerator Shoot()
+    {
+        yield return new WaitForSeconds(Random.Range(2f, 4f));
+        while(!_isEnemyDead)
+        {
+            GameObject enemyLaser = Instantiate(_laserPrefab, transform.position, transform.rotation);
+            enemyLaser.transform.parent = _laserContainer.transform;
+            Laser laser = enemyLaser.GetComponent<Laser>();
+            laser.AssignEnemy();
+            yield return new WaitForSeconds(Random.Range(3f, 5f));
+        }
+    }
+
+    private void OnPlayArea()
+    {
+        if ((transform.position.y > 5.8f || transform.position.y <= -6.1f || transform.position.x > 11f || transform.position.x < -11f) && !_isEnemyDead)
+        {
+            _isInPlayArea = false;
+            _boxCollder.enabled = false;
+        }
+        else if ( transform.position.y <= 5.8 && !_isEnemyDead)
+        {
+            _isInPlayArea = true;    
+            _boxCollder.enabled = true;
+        }
+    }
+
     private void OnTriggerEnter2D(Collider2D other)
     {
         if (other.gameObject.tag == "Player")
@@ -105,28 +136,15 @@ public class Enemy : MonoBehaviour
         Destroy(this.gameObject, 2.5f);
     }
 
-    private void OnPlayArea()
+    public void OnGamePause()
     {
-        if (transform.position.y > 5.8f || transform.position.y <= -6.1f || transform.position.x > 11f || transform.position.x < -11f)
-        {
-            _isInPlayArea = false;
-            _boxCollder.enabled = false;
-        }
-        else if ( transform.position.y <= 5.8)
-        {
-            _isInPlayArea = true;    
-            _boxCollder.enabled = true;
-        }
+        _speed = 0;
+        StopAllCoroutines();
     }
 
-    IEnumerator Shoot()
+    public void OnGameUpause()
     {
-        while(!_isEnemyDead)
-        {
-            GameObject enemyLaser = Instantiate(_laserPrefab, transform.position, transform.rotation);
-            Laser laser = enemyLaser.GetComponent<Laser>();
-            laser.AssignEnemy();
-            yield return new WaitForSeconds(Random.Range(3f, 5f));
-        }
+        _speed = 5.0f;
+        StartCoroutine(Shoot());
     }
 }

@@ -85,4 +85,14 @@ public class Powerups : MonoBehaviour
             _movement = Vector3.right;
         }
     }
+
+    public void OnGamePause()
+    {
+        _speed = 0;
+    }
+
+    public void OnGameUnpause()
+    {
+        _speed = 3.0f;
+    }
 }

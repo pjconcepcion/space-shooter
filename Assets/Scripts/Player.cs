@@ -17,10 +17,13 @@ public class Player : MonoBehaviour
 
     [SerializeField]
     private GameObject _firePrefab;
-    
+
     [SerializeField]
     private GameObject _tripleShotPrefab;
 
+    [SerializeField]
+    private GameObject _laserContainer;
+    
     [SerializeField]
     private GameObject _explosionPrefab;
 
@@ -39,10 +42,14 @@ public class Player : MonoBehaviour
     private SpawnManager _spawnManager;
     private UIManager _uiManager;
     private AudioSource _audioSource;
+    private GameManager _gameManager;
 
     private bool _isTripleShotActive = false;
     private bool _isShieldActive = false;
+    private bool _isSpeedActive = false;
     private bool _isInPlayArea = true;
+    private bool _isGamePause = false;
+    private bool _isOnPlayArea = true;
 
     // Start is called before the first frame update
     private void Start()
@@ -50,7 +57,8 @@ public class Player : MonoBehaviour
         transform.position = new Vector3(0,0,0);
 
         _spawnManager = GameObject.Find("SpawnManager").GetComponent<SpawnManager>();
-        _uiManager = GameObject.Find("Canvas").GetComponent<UIManager>();
+        _uiManager = GameObject.Find("Canvas").GetComponent<UIManager>();        
+        _gameManager = GameObject.Find("GameManager").GetComponent<GameManager>();
         _audioSource = GetComponent<AudioSource>();
 
         if (_spawnManager == null)
@@ -61,6 +69,11 @@ public class Player : MonoBehaviour
         if (_uiManager == null)
         {
             Debug.LogError("UI Manager not found.");
+        }
+
+        if (_gameManager == null)
+        {
+            Debug.LogError("Game Manager not found.");
         }
 
         if (_audioSource == null)
@@ -76,11 +89,60 @@ public class Player : MonoBehaviour
     // Update is called once per frame
     private void Update()
     {
-        Movement();
-        OnPlayArea();
-        if (Input.GetKeyDown(KeyCode.Space) && Time.time > _canFire)
+        if(!_isGamePause)
         {
-            Shoot();
+            Movement();
+            OnPlayArea();
+            if (Input.GetKeyDown(KeyCode.Space) && Time.time > _canFire && _isOnPlayArea)
+            {
+                Shoot();
+            }
+        }
+        
+        CheckPause();
+    }
+    
+    IEnumerator OnSpeedActiveRoutine()
+    {
+        yield return new WaitForSeconds(5.0f);
+        _speed /= _speedMultiplier;
+        _isSpeedActive = false;
+    }
+
+    IEnumerator OnTripleShotActiveRoutine()
+    {
+        yield return new WaitForSeconds(5.0f);
+        _isTripleShotActive = false;
+    }
+
+    private void CheckPause()
+    {        
+        if (Input.GetKeyDown(KeyCode.Escape))
+        {
+            if(!_isGamePause)
+            {
+                _gameManager.OnPause();
+                _isGamePause = true;   
+                return;
+            }
+
+            _gameManager.OnUnpause();
+            _isGamePause = false;
+            return;
+        }
+    }
+
+    private void OnPlayArea()
+    {
+        if (transform.position.y > 6.5f || transform.position.y <= -6.5f || transform.position.x > 11f || transform.position.x < -11f)
+        {
+            gameObject.tag = "Untagged";
+            _isOnPlayArea = false;
+        }
+        else if ( transform.position.y <= 7.4)
+        {
+            gameObject.tag = "Player";  
+            _isOnPlayArea = true; 
         }
     }
 
@@ -118,11 +180,13 @@ public class Player : MonoBehaviour
 
         if (!_isTripleShotActive)
         {
-            Instantiate(_firePrefab, transform.position, transform.rotation);
+            GameObject laser = Instantiate(_firePrefab, transform.position, transform.rotation);
+            laser.transform.parent = _laserContainer.transform;
         }
         else 
         {
-            Instantiate(_tripleShotPrefab, transform.position, transform.rotation);
+            GameObject laser = Instantiate(_tripleShotPrefab, transform.position, transform.rotation);
+            laser.transform.parent = _laserContainer.transform;
         }
 
         _audioSource.Play();
@@ -166,7 +230,11 @@ public class Player : MonoBehaviour
 
     public void OnSpeedActive()
     {
-        _speed *= _speedMultiplier;
+        if(!_isSpeedActive)
+        {
+            _speed *= _speedMultiplier;
+            _isSpeedActive = true;
+        }
         StartCoroutine(OnSpeedActiveRoutine());
     }
 
@@ -174,29 +242,5 @@ public class Player : MonoBehaviour
     {
         _isTripleShotActive = true;
         StartCoroutine(OnTripleShotActiveRoutine());
-    }
-
-    private void OnPlayArea()
-    {
-        if (transform.position.y > 6.5f || transform.position.y <= -6.5f || transform.position.x > 11f || transform.position.x < -11f)
-        {
-            gameObject.tag = "Untagged";
-        }
-        else if ( transform.position.y <= 7.4)
-        {
-            gameObject.tag = "Player";   
-        }
-    }
-
-    IEnumerator OnSpeedActiveRoutine()
-    {
-        yield return new WaitForSeconds(5.0f);
-        _speed /= _speedMultiplier;
-    }
-
-    IEnumerator OnTripleShotActiveRoutine()
-    {
-        yield return new WaitForSeconds(5.0f);
-        _isTripleShotActive = false;
     }
 }
